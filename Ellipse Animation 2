@@ -1,0 +1,68 @@
+# Based on Basic animation with FuncAnimation
+https://riptutorial.com/matplotlib/example/23558/basic-animation-with-funcanimation
+
+Let's animate a dot moving around an ellipse
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, FFMpegWriter
+%matplotlib notebook
+# set up figure size and DPI for screen demo
+plt.rcParams['figure.figsize'] = (7, 7)
+plt.rcParams['figure.dpi'] = 100
+
+TWOPI = 2*np.pi # numpy doesn't have tau (2π)
+
+fig, ax = plt.subplots()
+
+# h&k are offsets from the origin for later use when setting a star at a focus
+h = k = 0.0 # for now, the center of the ellipse is the origin
+a = 0.8     # a is the semimajor axis
+b = 1.2     # b is the semiminor axis
+
+def xpos():
+    return h + a*np.cos(theta)
+
+def ypos():
+    return h + b*np.sin(theta)
+
+theta = np.arange(0.0, TWOPI, 0.001) # ø values from 0 to π in increments of 0.001
+x = xpos()                    # x values from -1 to 1
+y = ypos()                    # y values from -1 to 1
+l = plt.plot(x, y)                   # x,y plot of t,s values
+ax = plt.axis([-2,2,-2,2]) # plt.axis([xmin, xmax, ymin, ymax]) equivalent to ax.set(xlim=(xmin, xmax), ylim=(ymin, ymax))
+
+redDot, = plt.plot([x[0]], [y[0]], 'ro')
+
+# plt.plot
+
+def animate(i):
+#     redDot.set_data(np.cos(i), np.sin(i))
+    redDot.set_data(x[int(i/0.01)], y[int(i/0.01)])
+    plt.title('radians: {:^2.1f}'.format(i))
+    return redDot,
+
+# create animation using the animate() function
+
+# disabling progress_callback lambda function during mybinder.org development on iPad :)
+
+# progress_callback = lambda i, n: print(f'Saving frame {i+1} of {n}')
+animation = FuncAnimation(fig, animate, frames=np.arange(0.0, TWOPI, 0.1),
+                          interval=50, blit=True, repeat=True)
+
+# animation = FuncAnimation(plt.gcf(), #get current figure or gcf
+#                           update, #the function to update
+#                           frames=frames, #overrides the default frames behavior of counting up i in integers from 0
+#                           interval=interval,
+#                           #repeat = False, #option to stop animation after one iteration
+#                           repeat_delay = 2e3, #optional delay in ms; 1e3 = 1000 ms = 1 s
+#                           #progress_callback=progress_callback
+#                           )
+
+# disabling saving .mp4 during mybinder.org development on iPad :)
+
+# # from matplotlib.animation import FFMpegWriter
+# writer = FFMpegWriter(fps=15, metadata=dict(artist='Stephen Shadle'), bitrate=1800)
+# #ani.save("/home/pi/Documents/Thonny/dynamic_image.mp4", writer=writer) #explicit directory
+# animation.save("animate_ellipse.mp4", writer=writer, progress_callback=progress_callback) #current directory
+plt.show()
